@@ -13,7 +13,7 @@ import ca.effenti.gameofcards.models.AppSharedPreferences;
 import ca.effenti.gameofcards.models.card.Card;
 import ca.effenti.gameofcards.models.card.CardDao;
 import ca.effenti.gameofcards.models.card.CardFactory;
-import ca.effenti.gameofcards.webservices.DeckOfCardsFactory;
+import ca.effenti.gameofcards.webservices.DeckOfCardsServiceFactory;
 import ca.effenti.gameofcards.webservices.DeckOfCardsService;
 import ca.effenti.gameofcards.webservices.deckofcards.CardsResponse;
 import ca.effenti.gameofcards.webservices.deckofcards.CreateDeckBody;
@@ -33,10 +33,13 @@ public class MainPresenterImpl implements MainPresenter, Observer<Card> {
     public MainPresenterImpl(MainView mainView, LifecycleOwner lifecycleOwner){
         this.view = mainView;
         this.lifecycleOwner = lifecycleOwner;
-        this.deckService = DeckOfCardsFactory.getService();
+
+        // Get service and database
+        // Ideally, these would be injected using a dependency injector
+        this.deckService = DeckOfCardsServiceFactory.getService();
         this.cardDao = AppDatabaseFactory.getDatabase().cardDao();
 
-        // Restore deck id from shared preferences
+        // Try to restore deck id from shared preferences
         this.setDeckId(AppSharedPreferences.getDeckId());
         if(this.deckId == null){
             this.initializeDeck();
@@ -52,6 +55,7 @@ public class MainPresenterImpl implements MainPresenter, Observer<Card> {
     }
 
     private void initializeDeck() {
+        // Do an asynchronous call to get a new deck
         this.deckService.createDeck(new CreateDeckBody(1)).enqueue(new Callback<DeckResponse>() {
             @Override
             public void onResponse(Call<DeckResponse> call, Response<DeckResponse> response) {
@@ -65,6 +69,7 @@ public class MainPresenterImpl implements MainPresenter, Observer<Card> {
 
     @Override
     public void onResume() {
+        // Reevaluate the state of our button
         this.view.enableDrawButton(this.deckId != null);
 
         // Connect to our database
@@ -99,11 +104,4 @@ public class MainPresenterImpl implements MainPresenter, Observer<Card> {
             this.view.showCardImage(card.getImage());
         }
     }
-
-//    @Override
-//    public void onChanged(@Nullable List<Card> cardList) {
-//        if (cardList != null && cardList.size() > 0) {
-//            this.view.showCardImage(cardList.get(cardList.size() - 1).getImage());
-//        }
-//    }
 }
