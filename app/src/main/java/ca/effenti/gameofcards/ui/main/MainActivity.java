@@ -8,6 +8,9 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ca.effenti.gameofcards.R;
 import ca.effenti.gameofcards.models.AppDatabaseFactory;
 import ca.effenti.gameofcards.models.card.CardDao;
@@ -16,20 +19,20 @@ import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferencesFactory;
 import ca.effenti.gameofcards.webservices.DeckOfCardsService;
 import ca.effenti.gameofcards.webservices.DeckOfCardsServiceFactory;
 
-public class MainActivity extends AppCompatActivity implements MainView, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements MainView {
     private MainPresenter presenter;
 
-    private Button drawButton;
-    private ImageView cardImage;
+    @BindView(R.id.btn_draw)
+    Button drawButton;
+    @BindView(R.id.img_card)
+    ImageView cardImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.drawButton = findViewById(R.id.btn_draw);
-        this.drawButton.setOnClickListener(this);
-        this.cardImage = findViewById(R.id.img_card);
+        ButterKnife.bind(this);
 
         DeckOfCardsService deckService = DeckOfCardsServiceFactory.getService();
         AppSharedPreferences sharedPreferences = AppSharedPreferencesFactory.getSharedPreferences();
@@ -65,10 +68,8 @@ public class MainActivity extends AppCompatActivity implements MainView, View.On
         Picasso.with(this).load(imageUrl).into(this.cardImage);
     }
 
-    @Override
-    public void onClick(View v) {
-        if(v == this.drawButton){
-            this.presenter.drawACard();
-        }
+    @OnClick(R.id.btn_draw)
+    void onDrawButtonClick() {
+        this.presenter.drawACard();
     }
 }
