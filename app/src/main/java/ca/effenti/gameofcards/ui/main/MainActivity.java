@@ -2,8 +2,11 @@ package ca.effenti.gameofcards.ui.main;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import ca.effenti.gameofcards.R;
 import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferences;
@@ -11,7 +14,7 @@ import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferencesFactory;
 import ca.effenti.gameofcards.webservices.DeckOfCardsService;
 import ca.effenti.gameofcards.webservices.DeckOfCardsServiceFactory;
 
-public class MainActivity extends AppCompatActivity implements MainView {
+public class MainActivity extends AppCompatActivity implements MainView, View.OnClickListener {
     private MainPresenter presenter;
 
     private Button drawButton;
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         setContentView(R.layout.activity_main);
 
         this.drawButton = findViewById(R.id.btn_draw);
+        this.drawButton.setOnClickListener(this);
         this.cardImage = findViewById(R.id.img_card);
 
         DeckOfCardsService deckService = DeckOfCardsServiceFactory.getService();
@@ -45,5 +49,17 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public void enableDrawButton(boolean enabled) {
         this.drawButton.setEnabled(enabled);
+    }
+
+    @Override
+    public void showCardImage(String imageUrl) {
+        Picasso.with(this).load(imageUrl).into(this.cardImage);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v == this.drawButton){
+            this.presenter.drawACard();
+        }
     }
 }

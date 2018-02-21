@@ -2,6 +2,7 @@ package ca.effenti.gameofcards.ui.main;
 
 import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferences;
 import ca.effenti.gameofcards.webservices.DeckOfCardsService;
+import ca.effenti.gameofcards.webservices.dto.CardsResponse;
 import ca.effenti.gameofcards.webservices.dto.CreateDeckBody;
 import ca.effenti.gameofcards.webservices.dto.DeckResponse;
 import retrofit2.Call;
@@ -54,5 +55,20 @@ public class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void onPause() {
+    }
+
+    @Override
+    public void drawACard() {
+        this.deckService.drawCards(this.deckId, 1).enqueue(new Callback<CardsResponse>() {
+            @Override
+            public void onResponse(Call<CardsResponse> call, Response<CardsResponse> response) {
+                view.showCardImage(response.body().getCards().get(0).getImage());
+            }
+
+            @Override
+            public void onFailure(Call<CardsResponse> call, Throwable t) {
+
+            }
+        });
     }
 }
