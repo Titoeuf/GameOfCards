@@ -1,5 +1,16 @@
 package ca.effenti.gameofcards.ui.main;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.Observer;
+import android.os.AsyncTask;
+import android.support.annotation.Nullable;
+
+import java.io.IOException;
+import java.util.List;
+
+import ca.effenti.gameofcards.models.card.Card;
+import ca.effenti.gameofcards.models.card.CardDao;
+import ca.effenti.gameofcards.models.card.CardFactory;
 import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferences;
 import ca.effenti.gameofcards.webservices.DeckOfCardsService;
 import ca.effenti.gameofcards.webservices.dto.CardsResponse;
@@ -9,17 +20,27 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainPresenterImpl implements MainPresenter {
+public class MainPresenterImpl implements MainPresenter, Observer<Card> {
     private MainView view;
     private DeckOfCardsService deckService;
     private AppSharedPreferences sharedPreferences;
+    private CardDao cardDao;
+    private LifecycleOwner lifecycleOwner;
 
     private String deckId;
 
-    public MainPresenterImpl(MainView mainView, DeckOfCardsService deckOfCardsService, AppSharedPreferences appSharedPreferences){
+    public MainPresenterImpl(
+            MainView mainView,
+            DeckOfCardsService deckOfCardsService,
+            AppSharedPreferences appSharedPreferences,
+            CardDao cardDao,
+            LifecycleOwner lifecycleOwner
+    ){
         this.view = mainView;
         this.deckService = deckOfCardsService;
         this.sharedPreferences = appSharedPreferences;
+        this.cardDao = cardDao;
+        this.lifecycleOwner = lifecycleOwner;
 
         // Try to restore deck id from shared preferences
         this.setDeckId(this.sharedPreferences.getDeckId());
@@ -51,24 +72,39 @@ public class MainPresenterImpl implements MainPresenter {
 
     @Override
     public void onResume() {
+        // Reevaluate the state of our button
+        this.view.enableDrawButton(this.deckId != null);
+
+        // Connect to our database
+        this.cardDao.observeLast().observe(lifecycleOwner, this);
     }
 
     @Override
     public void onPause() {
+        this.cardDao.observeLast().removeObserver(this);
     }
 
     @Override
     public void drawACard() {
-        this.deckService.drawCards(this.deckId, 1).enqueue(new Callback<CardsResponse>() {
+        AsyncTask.execute(new Runnable() {
             @Override
-            public void onResponse(Call<CardsResponse> call, Response<CardsResponse> response) {
-                view.showCardImage(response.body().getCards().get(0).getImage());
-            }
-
-            @Override
-            public void onFailure(Call<CardsResponse> call, Throwable t) {
-
+            public void run() {
+                try {
+                    Response<CardsResponse> response = deckService.drawCards(deckId, 1).execute();
+                    // Save the cards
+                    List<Card> cardList = CardFactory.fromCardsResponse(response.body());
+                    cardDao.insert(cardList.get(0));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
+    }
+
+    @Override
+    public void onChanged(@Nullable Card card) {
+        if (card != null) {
+            this.view.showCardImage(card.getImage());
+        }
     }
 }

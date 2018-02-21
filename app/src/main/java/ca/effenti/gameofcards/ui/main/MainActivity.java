@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import ca.effenti.gameofcards.R;
+import ca.effenti.gameofcards.models.AppDatabaseFactory;
+import ca.effenti.gameofcards.models.card.CardDao;
 import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferences;
 import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferencesFactory;
 import ca.effenti.gameofcards.webservices.DeckOfCardsService;
@@ -31,7 +33,14 @@ public class MainActivity extends AppCompatActivity implements MainView, View.On
 
         DeckOfCardsService deckService = DeckOfCardsServiceFactory.getService();
         AppSharedPreferences sharedPreferences = AppSharedPreferencesFactory.getSharedPreferences();
-        this.presenter = new MainPresenterImpl(this, deckService, sharedPreferences);
+        CardDao cardDao = AppDatabaseFactory.getDatabase().cardDao();
+        this.presenter = new MainPresenterImpl(
+                this,
+                deckService,
+                sharedPreferences,
+                cardDao,
+                this
+        );
     }
 
     @Override
