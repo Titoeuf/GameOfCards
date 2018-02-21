@@ -6,6 +6,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import ca.effenti.gameofcards.R;
+import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferences;
+import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferencesFactory;
 import ca.effenti.gameofcards.webservices.DeckOfCardsService;
 import ca.effenti.gameofcards.webservices.DeckOfCardsServiceFactory;
 
@@ -24,7 +26,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         this.cardImage = findViewById(R.id.img_card);
 
         DeckOfCardsService deckService = DeckOfCardsServiceFactory.getService();
-        this.presenter = new MainPresenterImpl(this, deckService);
+        AppSharedPreferences sharedPreferences = AppSharedPreferencesFactory.getSharedPreferences();
+        this.presenter = new MainPresenterImpl(this, deckService, sharedPreferences);
     }
 
     @Override
@@ -37,5 +40,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
     protected void onPause() {
         this.presenter.onPause();
         super.onPause();
+    }
+
+    @Override
+    public void enableDrawButton(boolean enabled) {
+        this.drawButton.setEnabled(enabled);
     }
 }

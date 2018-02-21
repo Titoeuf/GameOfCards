@@ -10,8 +10,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DeckOfCardsServiceFactory {
     public static final String BASE_URL = "https://deckofcardsapi.com/api/";
 
-    private DeckOfCardsServiceFactory() {}
-
     private static Retrofit retrofit;
 
     public static DeckOfCardsService getService() {

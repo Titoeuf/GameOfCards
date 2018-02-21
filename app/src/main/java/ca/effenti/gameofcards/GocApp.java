@@ -1,20 +1,15 @@
 package ca.effenti.gameofcards;
 
 import android.app.Application;
-import android.content.Context;
+
+import ca.effenti.gameofcards.models.sharedpref.AppSharedPreferencesFactory;
 
 
 public class GocApp extends Application {
-    private static Context context;
-
     @Override
     public void onCreate() {
         super.onCreate();
 
-        GocApp.context = getApplicationContext();
-    }
-
-    public static Context getAppContext(){
-        return GocApp.context;
+        AppSharedPreferencesFactory.initialize(getApplicationContext());
     }
 }
