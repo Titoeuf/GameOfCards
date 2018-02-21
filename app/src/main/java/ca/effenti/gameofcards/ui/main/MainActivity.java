@@ -6,6 +6,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import ca.effenti.gameofcards.R;
+import ca.effenti.gameofcards.webservices.DeckOfCardsService;
+import ca.effenti.gameofcards.webservices.DeckOfCardsServiceFactory;
 
 public class MainActivity extends AppCompatActivity implements MainView {
     private MainPresenter presenter;
@@ -21,7 +23,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         this.drawButton = findViewById(R.id.btn_draw);
         this.cardImage = findViewById(R.id.img_card);
 
-        this.presenter = new MainPresenterImpl(this);
+        DeckOfCardsService deckService = DeckOfCardsServiceFactory.getService();
+        this.presenter = new MainPresenterImpl(this, deckService);
     }
 
     @Override
