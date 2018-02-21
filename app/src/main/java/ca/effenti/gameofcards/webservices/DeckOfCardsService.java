@@ -1,8 +1,8 @@
 package ca.effenti.gameofcards.webservices;
 
-import ca.effenti.gameofcards.webservices.deckofcards.CardsResponse;
-import ca.effenti.gameofcards.webservices.deckofcards.CreateDeckBody;
-import ca.effenti.gameofcards.webservices.deckofcards.DeckResponse;
+import ca.effenti.gameofcards.webservices.dto.CardsResponse;
+import ca.effenti.gameofcards.webservices.dto.CreateDeckBody;
+import ca.effenti.gameofcards.webservices.dto.DeckResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;

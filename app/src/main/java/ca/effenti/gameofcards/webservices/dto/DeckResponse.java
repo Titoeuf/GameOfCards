@@ -1,4 +1,4 @@
-package ca.effenti.gameofcards.webservices.deckofcards;
+package ca.effenti.gameofcards.webservices.dto;
 
 
 public class DeckResponse {

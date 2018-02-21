@@ -4,7 +4,7 @@ package ca.effenti.gameofcards.models.card;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.effenti.gameofcards.webservices.deckofcards.CardsResponse;
+import ca.effenti.gameofcards.webservices.dto.CardsResponse;
 
 public class CardFactory {
     public static List<Card> fromCardsResponse(CardsResponse cardsResponse){
